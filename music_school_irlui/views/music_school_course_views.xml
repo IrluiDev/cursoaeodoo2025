@@ -1,14 +1,228 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="music_school_course_action" model="ir.actions.act_window">
+    <record id="music_school_irlui_course_action" model="ir.actions.act_window">
         <field name="name">Course</field>
         <field name="res_model">music.school.course</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form,pivot,graph,calendar</field>
         <field name="context">{}</field>
         <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
             Create your first course
         </p>
+        </field>
+    </record>
+    <!-- Kanban view -->
+    <record id="music_school_irlui_course_view_kanban" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.kanban</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <kanban highlight_color="color" default_group_by="state" class="o_kanban_small_column" on_create="quick_create">
+                <field name="name"/>
+                <field name="sequence"/>
+                <field name="start_date"/>
+                <field name="instrument_id"/>
+                <field name="teacher_id"/>
+                <field name="level"/>
+                <templates>
+                    <t t-name="menu">
+                        <t t-if="widget.editable"><a role="menuitem" type="open" class="dropdown-item">Edit</a></t>
+                        <t t-if="widget.deletable"><a role="menuitem" type="delete" class="dropdown-item">Delete</a></t>
+                        <field name="color" widget="kanban_color_picker"/>
+                    </t>
+                    <t t-name="card">
+                        <div class="oe_kanban_card">
+                            <div class="oe_kanban_content oe_kanban_global_click oe_kanban_drag_handler">
+                                <field name="name" class="fw-bold fs-5"/>
+                                <field name="start_date"/>
+                                <field name="instrument_id"/>
+                            </div>
+                            <footer>
+                                <div class="d-flex mt-auto align-items-center">
+                                    <field name="level" widget="priority" class="me-2"/>
+                                </div>
+                                <field name="teacher_id" widget="many2one_avatar_user" class="ms-auto"/>
+                            </footer>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    <!-- List view -->
+    <record id="music_school_irlui_course_view_list" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.list</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <list multi_edit="1" string="Course">
+                <field name="name"/>
+                <field name="description" optional="show"/>
+                <field name="state" optional="show"/>
+                <field name="teacher_id" optional="show"/>
+                <field name="level" optional="show"/>
+                <field name="start_date"/>
+                <field name="end_date" optional="hide"/> 
+                <field name="capacity" optional="hide"/> 
+            </list>
+        </field>
+    </record>
+    <record id="music_school_course_irlui_view_form" model="ir.ui.view">
+        <field name="name">music.school.course.irlui.view.form</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <form string="Course">
+                <header>
+                    <button string="Action Draft" invisible="state in ('draft')" name="action_draft" type="object" class="btn-secondary"/>
+                    <button string="Action in Progress" invisible="state in ('progress')" name="action_progress" type="object" class="btn-success"/>
+                    <button string="Action finish" invisible="state in ('finished')" name="action_finished" type="object" class="btn-primary"/>
+                    <button string="Create Lesson" name="create_lesson" type="object" class="btn-primary"/>
+                    <button string="Assign students" groups="music_school_irlui.group_music_school_manager_irlui" name="assign_students" type="object" class="btn-secondary"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Course"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="start_date"  widget="date_range" options="{'related_end_date': 'end_date'}"/>
+                            <field name="end_date" widget="date_range" options="{'related_start_date': 'start_date'}"/>
+                            <field name="days_duration"/>
+                            <field name="days_remaining"/>
+                            <field name="level"/>
+                        </group>
+                        <group>
+                            <field name="teacher_id"/>
+                            <field name="instrument_id"/>
+                            <field name="capacity"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Description">
+                            <field name="description"/>
+                        </page>
+                        <page string="Students">
+                            <field name="student_ids"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Vista Form para Tableta -->
+    <record id="music_school_course_form_tablet" model="ir.ui.view">
+        <field name="name">music.school.course.form.tablet</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <form class="o_form_sheet_bg">
+<!--                 <control>
+                    <button string="Draft" 
+                            name="action_draft" 
+                            type="object" 
+                            class="btn btn-lg btn-outline-secondary me-2"
+                            invisible="state == 'draft'"/>
+                    
+                    <button string="In Progress" 
+                            name="action_progress" 
+                            type="object" 
+                            class="btn btn-lg btn-outline-warning me-2"
+                            invisible="state == 'progress'"/>
+                    
+                    <button string="Finished" 
+                            name="action_finished" 
+                            type="object" 
+                            class="btn btn-lg btn-outline-success"
+                            invisible="state == 'finished'"/>
+                </control> -->
+
+                <header>
+                    <div class="d-flex flex-column gap-3 align-items-center p-4 bg-light rounded shadow-sm mb-3">
+                        <h3><field name="name"/></h3>
+                        <div>
+                            <button string="Draft" 
+                                    name="action_draft" 
+                                    type="object" 
+                                    class="btn btn-lg btn-outline-secondary me-2"
+                                    invisible="state == 'draft'"/>
+                            <button string="In Progress" 
+                                    name="action_progress" 
+                                    type="object" 
+                                    class="btn btn-lg btn-outline-warning me-2"
+                                    invisible="state == 'progress'"/>
+                            <button string="Finished" 
+                                    name="action_finished" 
+                                    type="object" 
+                                    class="btn btn-lg btn-outline-success"
+                                    invisible="state == 'finished'"/>
+                        </div>
+                        <field name="state" widget="statusbar" class="mt-2"/>
+                    </div>
+                </header>
+
+                <sheet>
+                    <group>
+                        <field name="instrument_id"/>
+                        <field name="teacher_id"/>
+                        <field name="level"/>
+                        <field name="start_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+        <field name="priority" eval="20"/> <!-- Prioridad alta -->
+    </record>
+    <!-- Vista SEARCH -->   
+    <record id="music_school_course_irlui_view_search" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.search</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <search string="Courses">
+                <field name="name"/>
+                <field name="teacher_id"/>
+                <field name="instrument_id"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="In Progress" name="progress" domain="[('state', '=', 'progress')]"/>
+                <filter string="In Finished" name="finished" domain="[('state', '=', 'finished')]"/>
+                <filter string="Teacher" name="group_by_teacher" context="{'group_by': 'teacher_id'}" />
+                <filter string="Level" name="group_by_level" context="{'group_by': 'level'}" />
+            </search>
+        </field>
+    </record>
+    <!-- Vista Pivot -->
+    <record id="music_school_course_irlui_view_pivot" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.pivot</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <pivot string="Courses">
+                <field name="teacher_id" type="row"/>
+                <field name="start_date" type="col"/>
+                <field name="capacity" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <!-- Vista Graph -->
+    <record id="music_school_course_irlui_view_graph" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.graph</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <graph string="Courses" type="bar">
+                <field name="teacher_id"/>
+                <field name="capacity" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <!-- Vista Calendar -->
+    <record id="music_school_course_irlui_view_calendar" model="ir.ui.view">
+        <field name="name">music.school.irlui.course.view.calendar</field>
+        <field name="model">music.school.course</field>
+        <field name="arch" type="xml">
+            <calendar string="Courses" date_start="start_date" date_stop="end_date" color="color">
+                <field name="name"/>
+                <field name="teacher_id"/>
+                <field name="instrument_id"/>
+                <field name="level"/>
+            </calendar>
         </field>
     </record>
 </odoo>

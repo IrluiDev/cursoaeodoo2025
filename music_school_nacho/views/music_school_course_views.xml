@@ -41,6 +41,8 @@
                     <button string="Action Draft" invisible="state in ('draft')" name="action_draft" type="object" class="btn-secondary"/>
                     <button string="Action in Progress" invisible="state in ('progress')" name="action_progress" type="object" class="btn-success"/>
                     <button string="Action finish" invisible="state in ('finished')" name="action_finish" type="object" class="btn-primary"/>
+                    <button string="Create Lesson" name="create_lesson" type="object" class="btn-primary"/>
+                    <button string="Assign students" groups="music_school_nacho.group_music_school_manager" name="assign_students" type="object" class="btn-secondary"/>
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
@@ -51,7 +53,7 @@
                 </div>
                     <group>
                         <group>
-                            <field name="teacher_id" domain="[('level','=',level)]"/>
+                            <field name="teacher_id" options="{'no_create':1,'no_quick_create':1,'no_open':1}" domain="[('level','=',level)]"/>
                             <field name="instrument_id"/>
                             <field name="level"/>
                         </group>
@@ -59,12 +61,16 @@
                         <group>
                             <field name="start_date"/>
                             <field name="end_date"/>
+                            <field name="day_duration"/>
                             <field name="capacity"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Description">
                             <field name="description"/>
+                        </page>
+                        <page string="Students">
+                            <field name="student_ids"/>
                         </page>
                     </notebook>
                 </sheet>

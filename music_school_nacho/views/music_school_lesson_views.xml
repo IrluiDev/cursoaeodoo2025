@@ -25,6 +25,7 @@
                 <field name="room_id" optional="show"/>
                 <field name="duration" widget="float_time" optional="hide"/>
                 <field name="notes" optional="hide"/>
+                <field name="state" optional="show"/>
             </list>
         </field>
     </record>
@@ -34,6 +35,9 @@
         <field name="model">music.school.lesson</field>
         <field name="arch" type="xml">
             <form string="lesson">
+            <header>
+            <field name="state" widget="statusbar"/>
+            </header>
                 <sheet>
                 <div class="oe_title">
                     <h1>
@@ -52,7 +56,10 @@
                         
                     </group>
                     <notebook>
-                        <page name="Notes" string="string">
+                        <page name="attendances" string="Attendances">
+                            <field name="attendance_ids" context="{'default_is_present':True,'default_date': date,'list_view_ref': 'music_school_nacho.music_school_lesson_attendance_simple_view_tree'}"/>
+                        </page>
+                        <page name="notes" string="Notes">
                             <field name="notes"/>
                         </page>
                     </notebook>
@@ -73,6 +80,10 @@
                 <filter name="date" string="Date" context="{'group_by': 'date'}" />
                 <filter name="room" string="Room" context="{'group_by': 'room_id'}" />
                 <filter name="teacher" string="Teacher" context="{'group_by': 'teacher_id'}" />
+                <filter name="filter_yesterday" string="Ayer"
+                    domain="[('date', '&gt;=', (context_today() - relativedelta(days=1)).strftime('%%Y-%%m-%%d 00:00:00')),
+                         ('date', '&lt;', context_today().strftime('%%Y-%%m-%%d 00:00:00'))]"/>
+
             </search>
         </field>
     </record>
